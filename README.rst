@@ -27,20 +27,18 @@ What is pythonic-functional
 ===========================
 
 First of all please contribute to this section, I don't intend to define this
-all by my self.
+all by myself.
 
 Articles:
 
 * `This is probably`_ most important definition
 
-.. _`This is probably`: https://docs.python.org/dev/howto/functional.html
-
 * Pyrsistent_ is a helpful tool
 
+* `From set-theory to monads`_ (I still don't get them)
+
+.. _`This is probably`: https://docs.python.org/dev/howto/functional.html
 .. _Pyrsistent: http://pyrsistent.readthedocs.io/en/latest/
-
-* `From set-theory to monads` (I still don't get them)
-
 .. _`From set-theory to monads`: https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
 
 Rules:
