@@ -1,0 +1,83 @@
+===========
+Code Ballet
+===========
+
+Having a background in maths and functional-programming helps a lot writing good
+code. I know this when I see what `David McIver`_ does. Most of us do not have that
+background and learning only by reading and toying with what you read isn't
+effective. Going all mental and doing everything in Haskell, isn't a solution
+either.
+
+.. _`David McIver`: http://hypothesis.works
+
+So I decided to do a Bi-Weekly Puzzle to flex our maths-muscles. It is like
+code-golf_, but with different goals:
+
+* Write a nice, easy to understand solution
+
+* While being a pythonic-functional as possible
+
+* After entry deadline it is important to discuss all the entries
+
+  - And maybe come up with a improved, combined solution
+
+.. _code-golf: https://en.wikipedia.org/wiki/Code_golf
+
+What is pythonic-functional
+===========================
+
+First of all please contribute to this section, I don't intend to define this
+all by my self.
+
+Articles:
+
+* `This is probably`_ most important definition
+
+.. _`This is probably`: https://docs.python.org/dev/howto/functional.html
+
+* Pyrsistent_ is a helpful tool
+
+.. _Pyrsistent: http://pyrsistent.readthedocs.io/en/latest/
+
+* `From set-theory to monads` (I still don't get them)
+
+.. _`From set-theory to monads`: https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
+
+Rules:
+
+* You are allowed to emulate functional-concepts in python if it helps to prove
+  a point
+
+* There are things that are strictly unpythonic: ie. DO NOT emulate tail recursion
+  optimization
+
+  - There are other ways to keep stack-depth in check: `compare drop2() / drop3()`_
+
+* Python 3.5+ man, really dude!
+
+.. _`compare drop2() / drop3()`: https://gist.github.com/ganwell/a2c9136398fbbd70796ad15b0778ae68
+
+How to conduct a code-ballet
+============================
+
+* The platform is Github
+
+* Code-ballets are issues
+
+* Solutions are pull-requests
+
+* Directory structure
+
+.. code-block:: text
+   
+    * _resources/
+    * 2016-05-03-[name of problem]/
+    | * [github-user]/
+    | | README.rst
+    | | requirements.txt
+    | | [name of problem].py
+
+
+* Solve the code-ballet as early as possible
+
+* Submit the solution as late as possible
