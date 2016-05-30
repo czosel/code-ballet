@@ -15,7 +15,7 @@ code-golf_, but with different goals:
 
 * Write a nice, easy to understand solution
 
-* While being a pythonic-functional as possible
+* While being as pythonic-functional as possible
 
 * After entry deadline it is important to discuss all the entries
 
