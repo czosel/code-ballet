@@ -17,6 +17,16 @@ code-golf_, but with different goals:
 
 * While being as pythonic-functional as possible
 
+* **Define** your own goal (if it makes sense). Examples:
+
+  - Learn what the "import itertools" and "import functools" can do for you
+
+  - Use generators
+
+  - Solve it with a custom higher-level function
+
+  - ...
+
 * After entry deadline it is important to discuss all the entries
 
   - And maybe come up with a improved, combined solution
