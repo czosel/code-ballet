@@ -81,3 +81,10 @@ How to conduct a code-ballet
 * Solve the code-ballet as early as possible
 
 * Submit the solution as late as possible
+
+Contribute code-ballets
+=======================
+
+If you have a code-ballet you'd like to submit, please open a issue with the
+label "queue", without telling what the ballet is about, yet. I will assign a
+date to release the ballet.
