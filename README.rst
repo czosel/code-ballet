@@ -5,12 +5,12 @@ Code Ballet
 Having a background in maths and functional-programming helps a lot writing good
 code. I know this when I see what `David McIver`_ does. Most of us do not have that
 background and learning only by reading and toying with what you read isn't
-effective. Going all mental and doing everything in Haskell, isn't a solution
+effective. Going all mental and doing everything in Haskell isn't a solution
 either.
 
 .. _`David McIver`: http://hypothesis.works
 
-So I decided to do a Bi-Weekly Puzzle to flex our maths-muscles. It is like
+So I decided to do a bi-weekly puzzle to flex our maths-muscles. It is like
 code-golf_, but with different goals:
 
 * Write a nice, easy to understand solution
