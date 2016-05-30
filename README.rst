@@ -51,7 +51,7 @@ Rules:
 
   - There are other ways to keep stack-depth in check: `compare drop2() / drop3()`_
 
-* Try to avoid side-effect or only things for optimization like memoize
+* Try to avoid side-effects or use them only optimization like memoize
 
 * Python 3.5+ man, really dude!
 
