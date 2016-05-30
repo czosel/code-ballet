@@ -55,6 +55,12 @@ Rules:
 
 * Python 3.5+ man, really dude!
 
+Tips:
+
+* Click_ helps a lot
+
+.. _Click: http://click.pocoo.org/6/
+
 .. _`compare drop2() / drop3()`: https://gist.github.com/ganwell/a2c9136398fbbd70796ad15b0778ae68
 
 How to conduct a code-ballet
