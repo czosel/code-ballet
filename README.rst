@@ -93,6 +93,7 @@ How to conduct a code-ballet
     | | requirements.txt
     | | [name of problem].py
 
+* Describe your goals in README.rst
 
 * Solve the code-ballet as early as possible
 
