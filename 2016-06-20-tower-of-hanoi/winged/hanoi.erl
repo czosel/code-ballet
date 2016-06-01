@@ -13,9 +13,13 @@
 
 %% Commandline interface - use with erl -run ...
 hanoi_cmdline(Args) ->
-    [N|_] = Args,
+    [N|RestArgs] = Args,
     Solution = hanoi(list_to_integer(N)),
-    print_solution(Solution),
+
+    case RestArgs of
+        ["disable-output"] -> ok;
+        []                 -> print_solution(Solution)
+    end,
     erlang:halt().
 
 
@@ -97,7 +101,6 @@ solution_server(Solutions) ->
     receive {Client, {task, _N, _From, _To, _Via}=Task} ->
                 Solution = server_select_solution(Task, Solutions),
                 Client ! Solution,
-                %io:format("Server: sent response ~w~n", [Solution]),
                 solution_server(Solutions);
             {solution, {task, _N, _From, _To, _Via}=Task, _Solution} ->
                  solution_server(dict:store(Task, lookitupyourself, Solutions));  % use this to store the "solution"
@@ -109,7 +112,6 @@ solution_server(Solutions) ->
 
 
 server_select_solution({task, N, A, B, C}=Task, Solutions) ->
-    %io:format("Server: incoming request for task ~w~n", [Task]),
     Variants = [
                 {task, N, A, B, C}, % same as Task
                 {task, N, A, C, B},
@@ -120,21 +122,18 @@ server_select_solution({task, N, A, B, C}=Task, Solutions) ->
                ],
 
     Solution = server_select_solution(Task, Variants, Solutions),
-    %io:format("Task ~w - Solution: ~w~n", [Task, Solution]),
 
     case Solution of
         no_solution -> no_solution;
         {ok, Variant, Steps} ->
             case Variant of
                 Task   -> {exact,   Steps};
-                %_Other  -> no_solution                        % use this to only return exact solutions (slower)
                 _Other -> {similar, {{Task, Variant}, Steps}}  % use this to use similar solutions as well (faster)
             end
     end.
 
 server_select_solution(_Task, [],            _Solutions) -> no_solution;
 server_select_solution(Task,  [Variant|Rest], Solutions) ->
-    %io:format("Server: checking solution for ~w~n", [Variant]),
     case dict:is_key(Variant, Solutions) of
         true   -> {ok, Variant, dict:fetch(Variant, Solutions)};
         false  -> server_select_solution(Task, Rest, Solutions)
