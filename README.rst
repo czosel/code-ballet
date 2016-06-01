@@ -80,7 +80,7 @@ How to conduct a code-ballet
 
 * Code-ballets are issues
 
-* Solutions are pull-requests (@AdSy: Leeave the pull requests open!)
+* Solutions are pull-requests (@AdSy: Leeave the pull-requests open![1])
 
 * Directory structure
 
@@ -98,6 +98,8 @@ How to conduct a code-ballet
 * Solve the code-ballet as early as possible
 
 * Submit the solution as late as possible
+
+[1] The idea is to discuss on the pull-request and maybe add few commits to the PR after discussion.
 
 Contribute code-ballets
 =======================
