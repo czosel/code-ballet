@@ -23,7 +23,7 @@ code-golf_, but with different goals:
 
   - Use generators
 
-  - Solve it with a custom higher-level function
+  - Solve it with a custom higher-order function
 
   - ...
 
