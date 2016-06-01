@@ -57,7 +57,7 @@ calculate(N, From, To, Via, Server) ->
 
 indent(_, no_print) -> ok;
 indent(0, Text)     -> io:format(Text);
-indent(N, Text)     -> io:format("   "), indent(N-1, Text).
+indent(N, Text)     -> io:format(" "), indent(N-1, Text).
 
 print_solution(Steps) -> print_solution(Steps, 0).
 
