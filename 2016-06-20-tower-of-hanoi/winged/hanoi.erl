@@ -11,6 +11,10 @@
          solution_server/1
         ]).
 
+% Some run-time configuration. set to either true or false
+config(use_only_exact)         -> false; % false is faster
+config(server_store_solutions) -> true.  % true is MUUUUCH faster (false uses naive approach with no caching/memoizing)
+
 %% Commandline interface - use with erl -run ...
 hanoi_cmdline(Args) ->
     [N|RestArgs] = Args,
@@ -103,8 +107,10 @@ solution_server(Solutions) ->
                 Client ! Solution,
                 solution_server(Solutions);
             {solution, {task, _N, _From, _To, _Via}=Task, _Solution} ->
-                 solution_server(dict:store(Task, lookitupyourself, Solutions));  % use this to store the "solution"
-                %solution_server(Solutions);                                        % use this to ignore the solution (sloow)
+                case config(server_store_solutions) of
+                    true  -> solution_server(dict:store(Task, lookitupyourself, Solutions));
+                    false -> solution_server(Solutions)
+                end;
             Unknown ->
                 io:format("Solution server: unknown message ~w~n~n", [Unknown]),
                 solution_server(Solutions)
@@ -128,7 +134,10 @@ server_select_solution({task, N, A, B, C}=Task, Solutions) ->
         {ok, Variant, Steps} ->
             case Variant of
                 Task   -> {exact,   Steps};
-                _Other -> {similar, {{Task, Variant}, Steps}}  % use this to use similar solutions as well (faster)
+                _Other -> case config(use_only_exact) of
+                              true  -> no_solution;
+                              false -> {similar, {{Task, Variant}, Steps}}
+                          end
             end
     end.
 
