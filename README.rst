@@ -80,7 +80,7 @@ How to conduct a code-ballet
 
 * Code-ballets are issues
 
-* Solutions are pull-requests
+* Solutions are pull-requests (@AdSy: Leeave the pull requests open!)
 
 * Directory structure
 
