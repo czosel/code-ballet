@@ -22,7 +22,6 @@ hanoi_cmdline(Args) ->
 %% Programming interface - you can specify only the first tower (2nd and 3rd are assumed empty)
 hanoi(N) when is_integer(N) ->
     Server   = spawn_link(?MODULE, solution_server, [dict:new()]),
-    %io:format("Server: ~w~n", [Server]),
     Solution = calculate(N, Server),
     exit(Server, normal),
     Solution.
@@ -32,55 +31,113 @@ calculate(N, Server) when is_integer(N) ->
     calculate(N, a, b, c, Server).
 
 calculate(1, From, To, _Via, _Server) ->
-    [{{action, move, From, To}}];
+    [{action, move, From, To}];
 
 calculate(N, From, To, Via, Server) ->
-    Task = {task, From, To, Via},
+    Task = {task, N, From, To, Via},
 
     case get_solution(Task, Server) of
         no_solution ->
-            Solution = [
-                        Task |
-                        calculate(N-1, From, Via, To, Server) ++ 
-                        calculate(N-1, Via, To, From, Server)
-                       ],
+            Solution = calculate(N-1, From, Via, To, Server) ++ calculate(N-1, Via, To, From, Server),
             % Tell the server about our solution
             Server ! {solution, Task, Solution},
 
-            Solution;
-        Solution -> 
-            Action = {action, use_existing_solution, Solution},
-
-            [Task, Action]
+            [Task|Solution] ++ [end_of_task];
+        {similar, Solution} -> [Task,{action, similar_solution,       Solution}] ++ [end_of_task];
+        {exact,   Solution} -> [Task,{action, use_solution,     Task, Solution}] ++ [end_of_task]
     end.
 
-print_solution([])           -> ok;
-print_solution([Step|Rest])  ->
-    % note the reversed order - we prepend new steps when calculating, so we
-    % have to print the "current" step after all others
-    io:format("~w~n", [Step]),
-    print_solution(Rest),
+indent(_, no_print) -> ok;
+indent(0, Text)     -> io:format(Text);
+indent(N, Text)     -> io:format("   "), indent(N-1, Text).
+
+print_solution(Steps) -> print_solution(Steps, 0).
+
+print_solution([], _)           -> ok;
+print_solution([Step|Rest], Indent)  ->
+    NewIndent = case Step of
+        end_of_task -> Indent - 1;
+        {task, _N, _F, _T, _V}   -> Indent + 1;
+        _Other      -> Indent
+    end,
+    indent(Indent, step_display(Step)),
+    print_solution(Rest, NewIndent),
     ok.
+
+step_display(end_of_task) -> no_print;
+step_display({task, N, From, To, Via})         -> io_lib:format("Task: Move ~w pieces from ~w to ~w via ~w~n", [N, From, To, Via]);
+step_display({action,move,         From, To})  -> io_lib:format("Action: Move single piece from ~w to ~w~n", [From, To]);
+step_display({action,use_solution, {task, N, From, To, Via}, _Steps})  ->
+    io_lib:format(
+        "Repeat steps from last time when you moved ~w pieces from ~w to ~w via ~w~n",
+     [
+      N, From, To, Via % old task description
+     ]);
+step_display({action,similar_solution, {{{task, N, From, To, Via}, {task, N, F2, T2, V2}}, _Steps}})  ->
+    io_lib:format(
+        "Repeat steps from last time when you moved ~w pieces from ~w to ~w via ~w, but replace as follows: ~w -> ~w, ~w -> ~w, ~w -> ~w~n",
+     [
+      N, F2, T2, V2, % old task description,
+
+      F2, From, % from replacement
+      T2, To,   % to replacement
+      V2, Via   % via replacement
+     ]);
+step_display(Step) ->
+    io_lib:format("Ugh... unhandled step description: ~w~n", [Step]).
+
 
 get_solution(Task, Server) ->
     Server ! {self(), Task},
     receive Result -> Result
-    after 10       -> {error, server_dead}
+    after 1000     -> {error, server_dead}
     end.
 
 solution_server(Solutions) ->
-    receive {From, {task, _From, _To, _Via}=Task} ->
-                case dict:is_key(Task, Solutions) of
-                    true   -> From ! dict:fetch(Task, Solutions);
-                    false  -> From ! no_solution
-                end,
+    receive {Client, {task, _N, _From, _To, _Via}=Task} ->
+                Solution = server_select_solution(Task, Solutions),
+                Client ! Solution,
+                %io:format("Server: sent response ~w~n", [Solution]),
                 solution_server(Solutions);
-            {solution, {task, _From, _To, _Via}=Task, Solution} ->
-                solution_server(dict:store(Task, Solution, Solutions));
+            {solution, {task, _N, _From, _To, _Via}=Task, _Solution} ->
+                 solution_server(dict:store(Task, lookitupyourself, Solutions));  % use this to store the "solution"
+                %solution_server(Solutions);                                        % use this to ignore the solution (sloow)
             Unknown ->
                 io:format("Solution server: unknown message ~w~n~n", [Unknown]),
                 solution_server(Solutions)
     end.
 
+
+server_select_solution({task, N, A, B, C}=Task, Solutions) ->
+    %io:format("Server: incoming request for task ~w~n", [Task]),
+    Variants = [
+                {task, N, A, B, C}, % same as Task
+                {task, N, A, C, B},
+                {task, N, B, A, C},
+                {task, N, B, C, A},
+                {task, N, C, B, A},
+                {task, N, C, A, B}
+               ],
+
+    Solution = server_select_solution(Task, Variants, Solutions),
+    %io:format("Task ~w - Solution: ~w~n", [Task, Solution]),
+
+    case Solution of
+        no_solution -> no_solution;
+        {ok, Variant, Steps} ->
+            case Variant of
+                Task   -> {exact,   Steps};
+                %_Other  -> no_solution                        % use this to only return exact solutions (slower)
+                _Other -> {similar, {{Task, Variant}, Steps}}  % use this to use similar solutions as well (faster)
+            end
+    end.
+
+server_select_solution(_Task, [],            _Solutions) -> no_solution;
+server_select_solution(Task,  [Variant|Rest], Solutions) ->
+    %io:format("Server: checking solution for ~w~n", [Variant]),
+    case dict:is_key(Variant, Solutions) of
+        true   -> {ok, Variant, dict:fetch(Variant, Solutions)};
+        false  -> server_select_solution(Task, Rest, Solutions)
+    end.
 
 % vim: set sw=4 ts=4 et:
