@@ -99,7 +99,7 @@ How to conduct a code-ballet
 
 * Submit the solution as late as possible
 
-[1] In order to discuss on the pull-request and maybe add few commits to the PR after discussion.
+[1] In order to discuss on the pull-request and maybe add few commits to the PR after discussion. I will creae a branch     where all the entries are merge, so you can easily test them.
 
 Contribute code-ballets
 =======================
