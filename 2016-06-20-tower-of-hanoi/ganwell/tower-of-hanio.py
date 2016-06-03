@@ -35,10 +35,14 @@ def memoize(function):
             res = function(*args, **kwargs)
             cache[key] = res
         return res
+
+    def clear():
+        memoizer.cache = {}
+        memoizer.count = 0
+        memoizer.miss = 0
     memoizer.func = function
-    memoizer.cache = {}
-    memoizer.count = 0
-    memoizer.miss = 0
+    memoizer.clear = clear
+    clear()
     return memoizer
 
 # #### Hanoi evolution #####
