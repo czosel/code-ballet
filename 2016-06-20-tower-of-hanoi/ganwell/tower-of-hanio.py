@@ -23,7 +23,6 @@ def move_print(move):
 
 def memoize(function):
     """Caching results of a function"""
-    # This is bad of course, it just to be able to compare the solutions
 
     def memoizer(*args, **kwargs):
         """Memoize helper"""
@@ -127,12 +126,13 @@ memoize_info(memoize_hanoi)
 print("\n")
 print("""
 memoize_hanoi(1000)
-==================
+===================
 
-Pure-functional hanoi with memoize.
+Deep pure-functional hanoi with memoize.
 
 -> RecursionError: maximum recursion depth exceeded in comparison
 
 Now we have to modify the stack that we reach base caches early.
 """.strip())
+
 # memoize_hanoi(1000)
