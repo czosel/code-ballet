@@ -151,8 +151,8 @@ def pure_machine_hanoi(n, src=0, dst=2, tmp=1):
         frame.ret = (frame1.ret, move, frame2.ret)
 
     def hanoi(frame, n, src, dst, tmp):
-        frame.ret = ()
         if n < 1:
+            frame.ret = ()
             return ()
         frame1 = Frame(n - 1, src, tmp, dst)
         frame2 = Frame(n - 1, tmp, dst, src)
@@ -190,8 +190,8 @@ def memoize_machine_hanoi(n, src=0, dst=2, tmp=1):
         frame.ret = cache.get(key)
         if frame.ret is not None:
             return ()
-        frame.ret = ()
         if n < 1:
+            frame.ret = ()
             return ()
         frame1 = Frame(n - 1, src, tmp, dst)
         frame2 = Frame(n - 1, tmp, dst, src)
