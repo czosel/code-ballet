@@ -76,17 +76,17 @@ def stack_machine(f_func, *args, **kwargs):
     call = Frame(*args, **kwargs)
     stack.append(call)
 
-    try:
-        while True:
+    while True:
+        try:
             op = stack.pop()
-            if isinstance(op, Frame):
-                stack.extend(reversed(
-                    f_func(op, *op.args, **op.kwargs)
-                ))
-            else:
-                op()
-    except IndexError:
-        pass
+        except IndexError:
+            break
+        if isinstance(op, Frame):
+            stack.extend(reversed(
+                f_func(op, *op.args, **op.kwargs)
+            ))
+        else:
+            op()
     return call.ret
 
 
