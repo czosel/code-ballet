@@ -337,7 +337,7 @@ print("%fs" % (time.clock() - t))
 # #### Tests #####
 
 
-@given(st.integers(0, 14))
+@given(st.integers(0, 10))
 def test_basic_solutions(disks):
     rec = traverse(recursive_hanoi(disks))
     mem = traverse(memoize_hanoi(disks))
