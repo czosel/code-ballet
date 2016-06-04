@@ -37,6 +37,9 @@ class Stack(object):
 class Board(object):
     @classmethod
     def start(cls, height):
+        # TODO(KNR): bad idea to use "global" variable, on the other hand
+        # each Board represents just a single state during the game, so
+        # we probably lack a parent type
         cls._height = height  # actually equals to len(home) + len(interim) + len(target)
         return Board(range(0, height), [], [])
 
@@ -52,6 +55,12 @@ class Board(object):
         return False
 
     @staticmethod
+    def _pad_stack(stack):
+        pad = [-1] * Board._height
+        pad.extend(stack)
+        return pad[-Board._height:]
+
+    @staticmethod
     def _get_column_width(disk):
         return 1 + (disk) * 2
 
@@ -63,7 +72,11 @@ class Board(object):
                 ('-' * Board._get_column_width(c)).center(column_width))
 
     def __str__(self):
-        return '\n'.join(Board._get_row(a, b, c) for a, b, c in itertools.zip_longest(self._home, self._interim, self._target, fillvalue=-1))
+        return '\n'.join(Board._get_row(a, b, c) for a, b, c in
+                         itertools.zip_longest(Board._pad_stack(self._home),
+                                               Board._pad_stack(self._interim),
+                                               Board._pad_stack(self._target),
+                                               fillvalue=-1))
 
 
 def solve(n):

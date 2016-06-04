@@ -14,3 +14,12 @@ def test_print_initial_boards():
                           '    -----    |             |             \n'
                           '   -------   |             |             \n'
                           '  ---------  |             |             ')
+
+
+def test_print_arbitrary_board():
+    board = Board([4], [0, 2, 5], [1, 3])
+    assert str(board) == ('             |             |             \n'
+                          '             |             |             \n'
+                          '             |      -      |             \n'
+                          '             |    -----    |     ---     \n'
+                          '  ---------  | ----------- |   -------   ')
