@@ -1,5 +1,6 @@
 import collections
 import pyrsistent
+import time
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -175,6 +176,46 @@ def pure_machine_hanoi(n, src=0, dst=2, tmp=1):
     )
 
 
+def memoize_machine_hanoi(n, src=0, dst=2, tmp=1):
+
+    cache = {}
+
+    def result(frame, frame1, move, frame2, key):
+        ret = (frame1.ret, move, frame2.ret)
+        cache[key] = ret
+        frame.ret = ret
+
+    def hanoi(frame, n, src, dst, tmp):
+        key = (n, src, dst, tmp)
+        frame.ret = cache.get(key)
+        if frame.ret is not None:
+            return ()
+        frame.ret = ()
+        if n < 1:
+            return ()
+        frame1 = Frame(n - 1, src, tmp, dst)
+        frame2 = Frame(n - 1, tmp, dst, src)
+        return (
+            frame1,
+            frame2,
+            lambda: result(
+                frame,
+                frame1,
+                Move(src, dst),
+                frame2,
+                key
+            )
+        )
+
+    return stack_machine(
+        hanoi,
+        n,
+        src=src,
+        dst=dst,
+        tmp=tmp,
+    )
+
+
 print("""
 ===================
 The hanoi evolution
@@ -208,14 +249,27 @@ list(map(
 
 print("\n")
 print("""
-memoize_hanoi(100)
+memoize_hanoi(300)
 ==================
 
 Pure-functional hanoi with memoize.
 """.strip())
 print("\n")
-memoize_hanoi(100)
+t = time.clock()
+memoize_hanoi(300)
+dt = time.clock() - t
 memoize_info(memoize_hanoi)
+print("Execution time: %f" % dt)
+
+print("\n")
+print("""
+To compare with recursive_hanoi(18) only 18! but without memoize.
+""".strip())
+print("\n")
+t = time.clock()
+recursive_hanoi(18)
+dt = time.clock() - t
+print("Execution time: %f" % dt)
 
 print("\n")
 print("""
@@ -266,6 +320,19 @@ list(map(
     )
 ))
 
+print("\n")
+print("""
+memoize_machine_hanoi(2000)
+===========================
+
+In the last step we add the memoize to the pure_machine_hanoi, so we can
+finally solve hanoi(2000). Execution time:
+""".strip())
+print("\n")
+
+t = time.clock()
+memoize_machine_hanoi(2000)
+print("%fs" % (time.clock() - t))
 
 # #### Tests #####
 
@@ -276,8 +343,10 @@ def test_basic_solutions(disks):
     mem = traverse(memoize_hanoi(disks))
     mac = machine_hanoi(disks)
     pur = traverse(pure_machine_hanoi(disks))
+    pmm = traverse(memoize_machine_hanoi(disks))
     assert rec == mem
     assert rec == mac
     assert rec == pur
+    assert rec == pmm
 
 test_basic_solutions()
