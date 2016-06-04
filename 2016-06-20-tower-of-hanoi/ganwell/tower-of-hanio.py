@@ -68,7 +68,7 @@ def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
     return flat
 
 
-def stack_machine(f_func, *args, **kwargs):
+def stack_machine_simple(f_func, *args, **kwargs):
     stack = []
     stack.append(Frame(*args, **kwargs))
 
@@ -130,7 +130,7 @@ def machine_hanoi(n, src=0, dst=2, tmp=1):
             Frame(n - 1, tmp, dst, src),
         )
 
-    stack_machine(
+    stack_machine_simple(
         hanoi,
         n,
         src=src,
@@ -203,7 +203,8 @@ print("""
 machine_hanoi(4)
 ================
 
-stack machine based hanoi.
+Stack machine based hanoi. This works well, but since it is based on
+side-effects we can't memoize it.
 """.strip())
 print("\n")
 
@@ -219,9 +220,11 @@ list(map(
 
 
 @given(st.integers(0, 14))
-def test_basic_solotions(disks):
-    rec = recursive_hanoi(disks)
-    mem = memoize_hanoi(disks)
+def test_basic_solutions(disks):
+    rec = traverse(recursive_hanoi(disks))
+    mem = traverse(memoize_hanoi(disks))
+    mac = machine_hanoi(disks)
     assert rec == mem
+    assert rec == mac
 
-test_basic_solotions()
+test_basic_solutions()
