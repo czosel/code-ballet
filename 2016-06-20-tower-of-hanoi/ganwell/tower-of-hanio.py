@@ -5,6 +5,21 @@ from hypothesis import strategies as st
 
 Move = collections.namedtuple('Move', ('src', 'dst'))
 
+
+class Frame(object):
+    __slots__ = (
+        'frames',
+        'ret',
+        'args',
+        'kwargs',
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.frames = ()
+        self.ret    = None
+        self.args   = args
+        self.kwargs = kwargs
+
 # #### Helpers #####
 
 
@@ -57,6 +72,31 @@ def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
     return flat
 
 
+def stack_machine(f_func, f_result, *args, **kwargs):
+    stack = []
+    visit = []
+    stack.append(Frame(*args, **kwargs))
+
+    try:
+        while True:
+            frame = stack.pop()
+            visit.append(frame)
+            cont, new_frames = f_func(frame, *frame.args, **frame.kwargs)
+            frame.frames = new_frames
+            if cont:
+                stack.extend(new_frames)
+    except IndexError:
+        pass
+
+    try:
+        while True:
+            frame = visit.pop()
+            f_result(frame, *frame.args, **frame.kwargs)
+    except IndexError:
+        pass
+
+    return frame.ret
+
 # #### Hanoi evolution #####
 
 
@@ -86,6 +126,36 @@ def memoize_hanoi(n, src=0, dst=2, tmp=1):
         memoize_hanoi(n - 1, src, tmp, dst),
         Move(src, dst),
         memoize_hanoi(n - 1, tmp, dst, src),
+    )
+
+
+def machine_hanoi(n, src=0, dst=2, tmp=1):
+
+    end = Frame()
+    end.ret = ()
+
+    def hanoi(frame, n, src, dst, tmp):
+        if n < 1:
+            return False, (end, end)
+        return True, (
+            Frame(n - 1, src, tmp, dst),
+            Frame(n - 1, tmp, dst, src),
+        )
+
+    def result(frame, n, src, dst, tmp):
+        frame.ret = (
+            frame.frames[0].ret,
+            Move(src, dst),
+            frame.frames[1].ret,
+        )
+
+    return stack_machine(
+        hanoi,
+        result,
+        n,
+        src=src,
+        dst=dst,
+        tmp=tmp,
     )
 
 
@@ -146,6 +216,23 @@ lets try to build a generic stack machine as a higher-order function.
 """.strip())
 
 # memoize_hanoi(1000)
+
+print("\n")
+print("""
+machine_hanoi(4)
+================
+
+stack machine based hanoi.
+""".strip())
+print("\n")
+
+list(map(
+    move_print,
+    traverse(
+        machine_hanoi(3)
+    )
+))
+
 
 # #### Tests #####
 
