@@ -23,3 +23,14 @@ def test_print_arbitrary_board():
                           '             |      -      |             \n'
                           '             |    -----    |     ---     \n'
                           '  ---------  | ----------- |   -------   ')
+
+
+def test_initial_board_not_solved():
+    initial = Board.start(4)
+    assert not initial.is_solved()
+
+
+def test_full_target_board_solved():
+    board = Board.start(4)
+    board._home, board._target = board._target, board._home
+    assert board.is_solved()

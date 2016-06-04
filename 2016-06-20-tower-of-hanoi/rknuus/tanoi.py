@@ -52,7 +52,8 @@ class Board(object):
         pass
 
     def is_solved(self):
-        return False
+        # TODO(KNR): creating range over and over again is wasteful
+        return (self._home == [] and self._interim == [] and self._target == range(0, Board._height))
 
     @staticmethod
     def _pad_stack(stack):
