@@ -280,7 +280,7 @@ Deep pure-functional hanoi with memoize.
 
 -> RecursionError: maximum recursion depth exceeded in comparison
 
-Now we have to modify the stack that we reach base caches early. But this time
+We have to modify the stack that we reach base caches early. But this time
 it is actually impossible because our base-case is defined by stack-depth. So
 lets try to build a generic stack machine as a higher-order function.
 """.strip())
@@ -307,9 +307,9 @@ print("""
 pure_machine_hanoi(4)
 =====================
 
-This is now a pure version of the machine hanoi. In my opinion, the
-stack_machine is complete, meaning you can transform any python program to a
-stack_machine program.
+This is a pure version of the machine hanoi. In my opinion, the stack_machine
+is complete, meaning you can transform any python program to a stack_machine
+program.
 """.strip())
 print("\n")
 
