@@ -8,11 +8,13 @@ Move = collections.namedtuple('Move', ('src', 'dst'))
 
 class Frame(object):
     __slots__ = (
+        'ret',
         'args',
         'kwargs',
     )
 
     def __init__(self, *args, **kwargs):
+        self.ret    = None
         self.args   = args
         self.kwargs = kwargs
 
@@ -68,21 +70,23 @@ def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
     return flat
 
 
-def stack_machine_simple(f_func, *args, **kwargs):
+def stack_machine(f_func, *args, **kwargs):
     stack = []
-    stack.append(Frame(*args, **kwargs))
+    call = Frame(*args, **kwargs)
+    stack.append(call)
 
     try:
         while True:
-            frame = stack.pop()
-            if isinstance(frame, Frame):
+            op = stack.pop()
+            if isinstance(op, Frame):
                 stack.extend(reversed(
-                    f_func(*frame.args, **frame.kwargs)
+                    f_func(op, *op.args, **op.kwargs)
                 ))
             else:
-                frame()
+                op()
     except IndexError:
         pass
+    return call.ret
 
 
 # #### Hanoi evolution #####
@@ -121,7 +125,7 @@ def machine_hanoi(n, src=0, dst=2, tmp=1):
 
     res = []
 
-    def hanoi(n, src, dst, tmp):
+    def hanoi(frame, n, src, dst, tmp):
         if n < 1:
             return ()
         return (
@@ -130,7 +134,7 @@ def machine_hanoi(n, src=0, dst=2, tmp=1):
             Frame(n - 1, tmp, dst, src),
         )
 
-    stack_machine_simple(
+    stack_machine(
         hanoi,
         n,
         src=src,
@@ -138,6 +142,37 @@ def machine_hanoi(n, src=0, dst=2, tmp=1):
         tmp=tmp,
     )
     return res
+
+
+def pure_machine_hanoi(n, src=0, dst=2, tmp=1):
+
+    def result(frame, frame1, move, frame2):
+        frame.ret = (frame1.ret, move, frame2.ret)
+
+    def hanoi(frame, n, src, dst, tmp):
+        frame.ret = ()
+        if n < 1:
+            return ()
+        frame1 = Frame(n - 1, src, tmp, dst)
+        frame2 = Frame(n - 1, tmp, dst, src)
+        return (
+            frame1,
+            frame2,
+            lambda: result(
+                frame,
+                frame1,
+                Move(src, dst),
+                frame2,
+            )
+        )
+
+    return stack_machine(
+        hanoi,
+        n,
+        src=src,
+        dst=dst,
+        tmp=tmp,
+    )
 
 
 print("""
@@ -210,8 +245,24 @@ print("\n")
 
 list(map(
     move_print,
+    machine_hanoi(4)
+))
+
+print("\n")
+print("""
+pure_machine_hanoi(4)
+=====================
+
+This is now a pure version of the machine hanoi. In my opinion, the
+stack_machine is complete, meaning you can transform any python program to a
+stack_machine program.
+""".strip())
+print("\n")
+
+list(map(
+    move_print,
     traverse(
-        machine_hanoi(4)
+        pure_machine_hanoi(4)
     )
 ))
 
@@ -224,7 +275,9 @@ def test_basic_solutions(disks):
     rec = traverse(recursive_hanoi(disks))
     mem = traverse(memoize_hanoi(disks))
     mac = machine_hanoi(disks)
+    pur = traverse(pure_machine_hanoi(disks))
     assert rec == mem
     assert rec == mac
+    assert rec == pur
 
 test_basic_solutions()
