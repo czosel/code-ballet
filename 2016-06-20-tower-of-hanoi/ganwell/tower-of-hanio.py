@@ -1,5 +1,7 @@
 import collections
 import pyrsistent
+from hypothesis import given
+from hypothesis import strategies as st
 
 Move = collections.namedtuple('Move', ('src', 'dst'))
 
@@ -45,6 +47,16 @@ def memoize(function):
     clear()
     return memoizer
 
+
+def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
+    for item in structure:
+        if isinstance(item, leave):
+            flat = flat.append(item)
+        else:
+            flat = traverse(item, leave, flat)
+    return flat
+
+
 # #### Hanoi evolution #####
 
 
@@ -76,14 +88,6 @@ def memoize_hanoi(n, src=0, dst=2, tmp=1):
         memoize_hanoi(n - 1, tmp, dst, src),
     )
 
-
-def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
-    for item in structure:
-        if isinstance(item, leave):
-            flat = flat.append(item)
-        else:
-            flat = traverse(item, leave, flat)
-    return flat
 
 print("""
 ===================
@@ -136,7 +140,20 @@ Deep pure-functional hanoi with memoize.
 
 -> RecursionError: maximum recursion depth exceeded in comparison
 
-Now we have to modify the stack that we reach base caches early.
+Now we have to modify the stack that we reach base caches early. But this time
+it is actually impossible because our base-case is defined by stack-depth. So
+lets try to build a generic stack machine as a higher-order function.
 """.strip())
 
 # memoize_hanoi(1000)
+
+# #### Tests #####
+
+
+@given(st.integers(0, 14))
+def test_basic_solotions(disks):
+    rec = recursive_hanoi(disks)
+    mem = memoize_hanoi(disks)
+    assert rec == mem
+
+test_basic_solotions()
