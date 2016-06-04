@@ -8,15 +8,11 @@ Move = collections.namedtuple('Move', ('src', 'dst'))
 
 class Frame(object):
     __slots__ = (
-        'frames',
-        'ret',
         'args',
         'kwargs',
     )
 
     def __init__(self, *args, **kwargs):
-        self.frames = ()
-        self.ret    = None
         self.args   = args
         self.kwargs = kwargs
 
@@ -72,32 +68,22 @@ def traverse(structure, leave=Move, flat=pyrsistent.pvector()):
     return flat
 
 
-def stack_machine(f_func, f_result, *args, **kwargs):
+def stack_machine(f_func, *args, **kwargs):
     stack = []
-    visit = []
     stack.append(Frame(*args, **kwargs))
 
     try:
         while True:
             frame = stack.pop()
-            visit.append(frame)
-            cont, new_frames = f_func(frame, *frame.args, **frame.kwargs)
-            frame.frames = new_frames
-            if cont:
-                stack.extend(new_frames)
+            if isinstance(frame, Frame):
+                stack.extend(reversed(
+                    f_func(*frame.args, **frame.kwargs)
+                ))
+            else:
+                frame()
     except IndexError:
         pass
 
-    # Question for everyone: Can we avoid visit? Do virtual machines visit,
-    # too?
-    try:
-        while True:
-            frame = visit.pop()
-            f_result(frame, *frame.args, **frame.kwargs)
-    except IndexError:
-        pass
-
-    return frame.ret
 
 # #### Hanoi evolution #####
 
@@ -133,32 +119,25 @@ def memoize_hanoi(n, src=0, dst=2, tmp=1):
 
 def machine_hanoi(n, src=0, dst=2, tmp=1):
 
-    end = Frame()
-    end.ret = ()
+    res = []
 
-    def hanoi(frame, n, src, dst, tmp):
-        if n < 2:
-            return False, (end, end)
-        return True, (
+    def hanoi(n, src, dst, tmp):
+        if n < 1:
+            return ()
+        return (
             Frame(n - 1, src, tmp, dst),
+            lambda: res.append(Move(src, dst)),
             Frame(n - 1, tmp, dst, src),
         )
 
-    def result(frame, n, src, dst, tmp):
-        frame.ret = (
-            frame.frames[0].ret,
-            Move(src, dst),
-            frame.frames[1].ret,
-        )
-
-    return stack_machine(
+    stack_machine(
         hanoi,
-        result,
         n,
         src=src,
         dst=dst,
         tmp=tmp,
     )
+    return res
 
 
 print("""
