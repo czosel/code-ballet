@@ -88,6 +88,8 @@ def stack_machine(f_func, f_result, *args, **kwargs):
     except IndexError:
         pass
 
+    # Question for everyone: Can we avoid visit? Do virtual machines visit,
+    # too?
     try:
         while True:
             frame = visit.pop()
@@ -135,7 +137,7 @@ def machine_hanoi(n, src=0, dst=2, tmp=1):
     end.ret = ()
 
     def hanoi(frame, n, src, dst, tmp):
-        if n < 1:
+        if n < 2:
             return False, (end, end)
         return True, (
             Frame(n - 1, src, tmp, dst),
@@ -229,7 +231,7 @@ print("\n")
 list(map(
     move_print,
     traverse(
-        machine_hanoi(3)
+        machine_hanoi(4)
     )
 ))
 
