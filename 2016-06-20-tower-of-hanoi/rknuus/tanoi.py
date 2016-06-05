@@ -42,7 +42,21 @@ class Board(object):
         self._target = []
 
     def moves(self):
-        pass
+        if self._home:
+            if not self._interim or self._home[-1] < self._interim[-1]:
+                yield [-1, 1, 0]
+            if not self._target or self._home[-1] < self._target[-1]:
+                yield [-1, 0, 1]
+        if self._interim:
+            if not self._home or self._interim[-1] < self._home[-1]:
+                yield [1, -1, 0]
+            if not self._target or self._interim[-1] < self._target[-1]:
+                yield [0, -1, 1]
+        if self._target:
+            if not self._home or self._target[-1] < self._home[-1]:
+                yield [1, 0, -1]
+            if not self._interim or self._target[-1] < self._interim[-1]:
+                yield [0, 1, -1]
 
     def is_solved(self):
         # TODO(KNR): creating range over and over again is wasteful
@@ -79,13 +93,18 @@ class Moves(object):
         return self._height
 
     def solve(self):
-        initial = Board.start(self, self._height)
+        track = []
         queue = Queue()
-        queue.enqueue(initial)
+        board = Board.start(parent=self, height=self._height)
+        for move in board.moves():
+            queue.enqueue(move)
         while queue:
-            board = queue.dequeue()
+            move = queue.dequeue()
+            track.append(move)
+            board.apply(move)
             if board.is_solved():
-                print(board)
+                print(track)
                 break
             for move in board.moves():
                 queue.enqueue(move)
+            track.pop()
