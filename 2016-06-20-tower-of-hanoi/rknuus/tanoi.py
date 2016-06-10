@@ -3,8 +3,10 @@
 
 # TODO(KNR): enforce Python 3
 
+import argparse
 import copy
 import itertools
+import sys
 
 
 # TODO(KNR): replace by built-in queue and test performance
@@ -22,12 +24,11 @@ class Queue(object):
         return self._items.pop()
 
 
-class Board(object):
-    def __init__(self, parent):
-        # TODO(KNR): it shouldn't matter whether we store a pointer to parent or the height
-        self._parent = parent
+class Tower(object):
+    def __init__(self, height):
+        self._height = height
         # TODO(KNR): replace lists by numbers and set bits for the disks, measure memory and runtime performance
-        self._home = list(reversed(range(0, self._parent.height())))
+        self._home = list(reversed(range(0, self._height)))
         self._interim = []
         self._target = []
 
@@ -39,58 +40,61 @@ class Board(object):
         return not self.__eq__(other)
 
     def __hash__(self):
+        # Lists are not hashable, so convert them to strings.
+        # Avoid that Towers with swapped lists generate the same hash by salting each list.
         return hash('a'+str(self._home)) ^ hash('b'+str(self._interim)) ^ hash('c'+str(self._target))
 
     def moves(self):
+        # TODO(KNR): factor out duplicate code
         if self._home:
             if not self._interim or self._home[-1] < self._interim[-1]:
-                board = copy.deepcopy(self)
-                board._interim.append(board._home.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._interim.append(Tower._home.pop())
+                yield Tower
             if not self._target or self._home[-1] < self._target[-1]:
-                board = copy.deepcopy(self)
-                board._target.append(board._home.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._target.append(Tower._home.pop())
+                yield Tower
         if self._interim:
             if not self._home or self._interim[-1] < self._home[-1]:
-                board = copy.deepcopy(self)
-                board._home.append(board._interim.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._home.append(Tower._interim.pop())
+                yield Tower
             if not self._target or self._interim[-1] < self._target[-1]:
-                board = copy.deepcopy(self)
-                board._target.append(board._interim.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._target.append(Tower._interim.pop())
+                yield Tower
         if self._target:
             if not self._home or self._target[-1] < self._home[-1]:
-                board = copy.deepcopy(self)
-                board._home.append(board._target.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._home.append(Tower._target.pop())
+                yield Tower
             if not self._interim or self._target[-1] < self._interim[-1]:
-                board = copy.deepcopy(self)
-                board._interim.append(board._target.pop())
-                yield board
+                Tower = copy.deepcopy(self)
+                Tower._interim.append(Tower._target.pop())
+                yield Tower
 
     def is_solved(self):
         # TODO(KNR): creating range over and over again is wasteful
         # TODO(KNR): it's an invariant, that the total number of disks remains constant, so
         # can check home and interim only (or target only), check performance
-        return (self._home == [] and self._interim == [] and self._target == list(reversed(range(0, self._parent.height()))))
+        return (self._home == [] and self._interim == [] and self._target == list(reversed(range(0, self._height))))
 
     # TODO(KNR): is there a simpler and more elegant way?
     def _pad_stack(self, stack):
-        pad = [-1] * self._parent.height()
+        pad = [-1] * self._height
         pad.extend(reversed(stack))
-        return pad[-self._parent.height():]
+        return pad[-self._height:]
 
     @staticmethod
     def _get_column_width(disk):
         return 1 + (disk) * 2
 
     def _get_row(self, a, b, c):
-        column_width = Board._get_column_width(self._parent.height()) + 2  # add padding
-        return (('-' * Board._get_column_width(a)).center(column_width) + '|' +
-                ('-' * Board._get_column_width(b)).center(column_width) + '|' +
-                ('-' * Board._get_column_width(c)).center(column_width))
+        column_width = Tower._get_column_width(self._height) + 2  # add padding
+        return (('-' * Tower._get_column_width(a)).center(column_width) + '|' +
+                ('-' * Tower._get_column_width(b)).center(column_width) + '|' +
+                ('-' * Tower._get_column_width(c)).center(column_width))
 
     def __str__(self):
         return '\n'.join(self._get_row(a, b, c) for a, b, c in
@@ -100,44 +104,45 @@ class Board(object):
                                                fillvalue=-1))
 
 
-class Moves(object):
+class Priests(object):
     def __init__(self, height):
         self._height = height
 
-    def height(self):
-        return self._height
-
-    def solve(self):
+    def transfer(self):
         queue = Queue()
-        board = Board(parent=self)
+        tower = Tower(height=self._height)
         # TODO(KNR): only works for really small heights
+        # TODO(KNR): is it faster to use a set to keep track of all seen towers?
+        # To keep track of all intermediate towers and the tracks to get there.
         seen = {}
-        queue.enqueue(board)
-        seen[board] = [board]
-        assert board in seen
-        solution = 1
+        queue.enqueue(tower)
+        seen[tower] = [tower]
         while queue:
-            board = queue.dequeue()
-            if board.is_solved():
-                track = seen[board]
-                print('solution {0} with {1} moves:\n'.format(solution, len(track)-1))
-                print('\n{0}\n\n\n'.format('=' * 3 * (3 + Board._get_column_width(self._height))).join(str(b) for b in track))  # TODO(KNR): return or yield
-                solution += 1
-            for move in board.moves():
+            tower = queue.dequeue()
+            if tower.is_solved():
+                track = seen[tower]
+                print('solution has {0} moves:\n'.format(len(track)-1))
+                print('\n{0}\n\n\n'.format('=' * 3 * (3 + tower._get_column_width(self._height))).join(str(b) for b in track))  # TODO(KNR): return or yield
+                # Exercise for the reader: prove that there is one and only one shortest solution
+                break
+            for move in tower.moves():
+                # Probably because we use breadth first search we don't have to cover the case
+                # that we have seen an intermediate tower but got a shorter track later on.
                 if move not in seen:
-                    queue.enqueue(move)  # TODO(KNR): if current track is shorter, remove move from queue before adding it again
-                    track = copy.deepcopy(seen[board])
+                    queue.enqueue(move)
+                    track = copy.deepcopy(seen[tower])
                     track.append(move)
                     seen[move] = track
-                    assert move in seen
         print('done')
 
 
-def main():
-    # TODO(KNR): replace height by command line argument
-    moves = Moves(2)
-    moves.solve()
+def main(args):
+    arguments = argparse.ArgumentParser()
+    arguments.add_argument('height', type=int, help='height of the tower')
+    args = arguments.parse_args()
+    priests = Priests(height=args.height)
+    priests.transfer()
 
 
 if __name__ == "__main__":
-    main()
+    main(args=sys.argv)
