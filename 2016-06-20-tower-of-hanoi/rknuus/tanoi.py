@@ -4,24 +4,11 @@
 # TODO(KNR): enforce Python 3
 
 import argparse
+import asyncio
 import copy
 import itertools
 import sys
-
-
-# TODO(KNR): replace by built-in queue and test performance
-class Queue(object):
-    def __init__(self):
-        self._items = []
-
-    def __bool__(self):
-        return bool(self._items)
-
-    def enqueue(self, item):
-        self._items.insert(0, item)
-
-    def dequeue(self):
-        return self._items.pop()
+import timeit
 
 
 class Tower(object):
@@ -44,35 +31,39 @@ class Tower(object):
         # Avoid that Towers with swapped lists generate the same hash by salting each list.
         return hash('a'+str(self._home)) ^ hash('b'+str(self._interim)) ^ hash('c'+str(self._target))
 
+    @staticmethod
+    def _can_move(source, target):
+        return (not target or source[-1] < target[-1])
+
     def moves(self):
-        # TODO(KNR): factor out duplicate code
+        # TODO(KNR): factor out duplicate code, need to put all list members into a list of lists or a tuple
         if self._home:
-            if not self._interim or self._home[-1] < self._interim[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._interim.append(Tower._home.pop())
-                yield Tower
-            if not self._target or self._home[-1] < self._target[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._target.append(Tower._home.pop())
-                yield Tower
+            if Tower._can_move(source=self._home, target=self._interim):
+                tower = copy.deepcopy(self)
+                tower._interim.append(tower._home.pop())
+                yield tower
+            if Tower._can_move(source=self._home, target=self._target):
+                tower = copy.deepcopy(self)
+                tower._target.append(tower._home.pop())
+                yield tower
         if self._interim:
-            if not self._home or self._interim[-1] < self._home[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._home.append(Tower._interim.pop())
-                yield Tower
-            if not self._target or self._interim[-1] < self._target[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._target.append(Tower._interim.pop())
-                yield Tower
+            if Tower._can_move(source=self._interim, target=self._home):
+                tower = copy.deepcopy(self)
+                tower._home.append(tower._interim.pop())
+                yield tower
+            if Tower._can_move(source=self._interim, target=self._target):
+                tower = copy.deepcopy(self)
+                tower._target.append(tower._interim.pop())
+                yield tower
         if self._target:
-            if not self._home or self._target[-1] < self._home[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._home.append(Tower._target.pop())
-                yield Tower
-            if not self._interim or self._target[-1] < self._interim[-1]:
-                Tower = copy.deepcopy(self)
-                Tower._interim.append(Tower._target.pop())
-                yield Tower
+            if Tower._can_move(source=self._target, target=self._home):
+                tower = copy.deepcopy(self)
+                tower._home.append(tower._target.pop())
+                yield tower
+            if Tower._can_move(source=self._target, target=self._interim):
+                tower = copy.deepcopy(self)
+                tower._interim.append(tower._target.pop())
+                yield tower
 
     def is_solved(self):
         # TODO(KNR): creating range over and over again is wasteful
@@ -109,31 +100,29 @@ class Priests(object):
         self._height = height
 
     def transfer(self):
-        queue = Queue()
+        queue = asyncio.Queue()
         tower = Tower(height=self._height)
         # TODO(KNR): only works for really small heights
         # TODO(KNR): is it faster to use a set to keep track of all seen towers?
-        # To keep track of all intermediate towers and the tracks to get there.
         seen = {}
-        queue.enqueue(tower)
+        queue.put_nowait(tower)
         seen[tower] = [tower]
-        while queue:
-            tower = queue.dequeue()
+        while not queue.empty():
+            tower = queue.get_nowait()
             if tower.is_solved():
                 track = seen[tower]
                 print('solution has {0} moves:\n'.format(len(track)-1))
                 print('\n{0}\n\n\n'.format('=' * 3 * (3 + tower._get_column_width(self._height))).join(str(b) for b in track))  # TODO(KNR): return or yield
-                # Exercise for the reader: prove that there is one and only one shortest solution
                 break
             for move in tower.moves():
-                # Probably because we use breadth first search we don't have to cover the case
+                # Because we use breadth first search we don't have to cover the case
                 # that we have seen an intermediate tower but got a shorter track later on.
                 if move not in seen:
-                    queue.enqueue(move)
+                    queue.put_nowait(move)
                     track = copy.deepcopy(seen[tower])
                     track.append(move)
                     seen[move] = track
-        print('done')
+        print('Done, let\'s pray.')
 
 
 def main(args):
