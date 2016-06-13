@@ -139,9 +139,13 @@ class Priests(object):
 def main(args):
     arguments = argparse.ArgumentParser()
     arguments.add_argument('height', type=int, help='height of the tower')
+    arguments.add_argument('--timeit', action='store_true', help='print timing information')
     args = arguments.parse_args()
-    priests = Priests(height=args.height)
-    priests.transfer()
+    if args.timeit:
+        print(timeit.timeit('priests.transfer()', number=5, setup='from __main__ import Priests; priests = Priests({0})'.format(args.height), globals=globals()))
+    else:
+        priests = Priests(height=args.height)
+        priests.transfer()
 
 
 if __name__ == "__main__":
