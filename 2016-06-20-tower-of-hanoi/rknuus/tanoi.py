@@ -106,11 +106,13 @@ class Priests(object):
         seen = {}
         queue.put_nowait(tower)
         seen[tower] = [tower]
+        positions = 0
         while not queue.empty():
             tower = queue.get_nowait()
+            positions += 1
             if tower.is_solved():
                 track = seen[tower]
-                solution = 'solution has {0} moves:\n'.format(len(track)-1)
+                solution = 'solution has {0} moves (searched {1} positions):\n'.format(len(track)-1, positions)
                 solution += '\n{0}\n\n\n'.format('=' * 3 * (3 + tower._get_column_width(self._height))).join(str(b) for b in track)
                 return solution
             for move in tower.moves():
