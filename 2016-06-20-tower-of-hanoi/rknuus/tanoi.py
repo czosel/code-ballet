@@ -111,9 +111,9 @@ class Priests(object):
             tower = queue.get_nowait()
             if tower.is_solved():
                 track = seen[tower]
-                print('solution has {0} moves:\n'.format(len(track)-1))
-                print('\n{0}\n\n\n'.format('=' * 3 * (3 + tower._get_column_width(self._height))).join(str(b) for b in track))  # TODO(KNR): return or yield
-                break
+                solution = 'solution has {0} moves:\n'.format(len(track)-1)
+                solution += '\n{0}\n\n\n'.format('=' * 3 * (3 + tower._get_column_width(self._height))).join(str(b) for b in track)
+                return solution
             for move in tower.moves():
                 # Because we use breadth first search we don't have to cover the case
                 # that we have seen an intermediate tower but got a shorter track later on.
@@ -131,10 +131,12 @@ def main(args):
     arguments.add_argument('--timeit', action='store_true', help='print timing information')
     args = arguments.parse_args()
     if args.timeit:
-        print(timeit.timeit('priests.transfer()', number=5, setup='from __main__ import Priests; priests = Priests({0})'.format(args.height), globals=globals()))
+        print(timeit.timeit('priests.transfer()', number=5, setup='from __main__ import Priests; priests = Priests({0})'.format(args.height), globals=globals()),
+              ' (for 5 runs)')
     else:
         priests = Priests(height=args.height)
-        priests.transfer()
+        solution = priests.transfer()
+        print(solution)
 
 
 if __name__ == "__main__":
