@@ -3,7 +3,7 @@ from tanoi import Tower, Priests
 
 def initialize_tower(home, interim, target):
     tower = Tower(len(home) + len(interim) + len(target))
-    tower._home, tower._interim, tower._target = home, interim, target
+    tower._home, tower._auxiliary, tower._target = home, interim, target
     return tower
 
 
@@ -52,7 +52,7 @@ def test_moves_from_initial_tower():
     assert set(tower.moves()) == expected_moves
 
 
-def test_both_moves_from_interim_tower():
+def test_both_moves_from_auxiliary_tower():
     tower = initialize_tower([], [0], [])
     expected_moves = {initialize_tower([0], [], []), initialize_tower([], [], [0])}
     assert set(tower.moves()) == expected_moves
@@ -64,7 +64,7 @@ def test_both_moves_from_target_tower():
     assert set(tower.moves()) == expected_moves
 
 
-def test_moves_if_home_to_intermediate_illegal():
+def test_moves_if_home_to_auxiliary_illegal():
     tower = initialize_tower([1], [0], [])
     expected_moves = {initialize_tower([], [0], [1]),
                       initialize_tower([1], [], [0]),
@@ -72,7 +72,7 @@ def test_moves_if_home_to_intermediate_illegal():
     assert set(tower.moves()) == expected_moves
 
 
-def test_moves_if_intermediate_to_home_illegal():
+def test_moves_if_auxiliary_to_home_illegal():
     tower = initialize_tower([0], [1], [])
     expected_moves = {initialize_tower([], [1, 0], []),
                       initialize_tower([], [1], [0]),
