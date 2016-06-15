@@ -66,10 +66,9 @@ class Tower(object):
                 yield tower
 
     def is_solved(self):
-        # TODO(KNR): creating range over and over again is wasteful
-        # TODO(KNR): it's an invariant, that the total number of disks remains constant, so
-        # can check home and interim only (or target only), check performance
-        return (self._home == [] and self._interim == [] and self._target == list(reversed(range(0, self._height))))
+        # Because the total number of disks remains constant, it's enough to
+        # check whether home and interim are empty
+        return (self._home == [] and self._interim == [])
 
     # TODO(KNR): is there a simpler and more elegant way?
     def _pad_stack(self, stack):
