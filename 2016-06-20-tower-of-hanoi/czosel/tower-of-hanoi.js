@@ -27,20 +27,23 @@ function memoizableMove(n, a = "A", b = "B", c = "C") {
     } else {
         missCount++;
         const result = [].concat(
-            swap(memoizableMove((n - 1)), b, c),
+            swap(memoizableMove((n - 1)), {
+                [b]: c,
+                [c]: b
+            }),
             memoizableMove(1),
-            swap(swap(memoizableMove(n - 1), a, c), a, b)
+            swap(memoizableMove(n - 1), {
+                [a]: c,
+                [b]: a,
+                [c]: b
+            })
         )
         cache[n + a + b + c] = result
         return result
     }
 }
 
-function swap(moves, a, b) {
-    const map = {
-        [a]: b,
-        [b]: a
-    }
+function swap(moves, map) {
     return moves.map(move => {
         return move.map(pos => {
             return map[pos] ? map[pos] : pos
@@ -49,5 +52,5 @@ function swap(moves, a, b) {
 }
 
 // console.log(move(3, "A", "B", "C"))
-console.log(memoizableMove(10, "A", "B", "C"))
+console.log(memoizableMove(20, "A", "B", "C"))
 console.log(`cache hit:miss ${hitCount}:${missCount}`)
