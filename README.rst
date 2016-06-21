@@ -23,7 +23,7 @@ code-golf_, but with different goals:
 
   - Use generators
 
-  - Solve it with a custom higher-level function
+  - Solve it with a custom higher-order function
 
   - ...
 
@@ -80,7 +80,7 @@ How to conduct a code-ballet
 
 * Code-ballets are issues
 
-* Solutions are pull-requests
+* Solutions are pull-requests (@AdSy: Leeave the pull-requests open![1])
 
 * Directory structure
 
@@ -98,6 +98,8 @@ How to conduct a code-ballet
 * Solve the code-ballet as early as possible
 
 * Submit the solution as late as possible
+
+[1] In order to discuss on the pull-request and maybe add few commits to the PR after discussion. I will creae a branch     where all the entries are merge, so you can easily test them.
 
 Contribute code-ballets
 =======================
