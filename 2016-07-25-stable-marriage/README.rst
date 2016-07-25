@@ -85,5 +85,5 @@ we are no mathematicians we need to try this ideas ourself to get a notion
 whether the idea makes sense: Maybe there is nothing beyond what was said in the
 video.
 
-.. _hypthothesis: http://hypothesis.works
+.. _hypothesis: http://hypothesis.works
 .. _SymPy: http://www.sympy.org/
