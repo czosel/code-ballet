@@ -2,6 +2,10 @@
 Code Ballet
 ===========
 
+`PAST CODE BALLET SOLUTIONS`_
+
+.. _`PAST CODE BALLET SOLUTIONS`: https://github.com/adfinis-sygroup/code-ballet/pulls?q=is%3Apr+is%3Aclosed+label%3Aballet
+
 Having a background in maths and functional-programming helps a lot writing good
 code. I know this when I see what `David McIver`_ does. Most of us do not have that
 background and learning only by reading and toying with what you read isn't
