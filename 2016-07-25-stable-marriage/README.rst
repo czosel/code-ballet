@@ -14,7 +14,7 @@ Constraints
 ===========
 
 * Python, python and python-only, which makes it much easier to compare and
-comment on solutions.
+  comment on solutions.
 
 * Implement a generic solution that accepts configurations as input or generates
   configurations automatically
