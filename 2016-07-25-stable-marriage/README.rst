@@ -19,6 +19,11 @@ Constraints
 * Implement a generic solution that accepts configurations as input or generates
   configurations automatically
 
+* Jupyter_ notebooks are most welcome, but please write a requirements.txt, so
+  the notebook runs immediately
+
+.. _Jupyter: http://jupyter.org/
+
 Problems
 ========
 
