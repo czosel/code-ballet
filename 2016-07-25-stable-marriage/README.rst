@@ -14,13 +14,13 @@ Constraints
 ===========
 
 * Python, python and python-only, which makes it much easier to compare and
-  comment on solutions.
+  comment on solutions
 
 * Implement a generic solution that accepts configurations as input or generates
   configurations automatically
 
 * Jupyter_ notebooks are most welcome, but please write a requirements.txt, so
-  the notebook runs immediately
+  the notebook runs without errors
 
 .. _Jupyter: http://jupyter.org/
 
@@ -40,7 +40,7 @@ possible match and every man the worst possible.
 Solver
 ------
 
-* Use a solver or optimizer to solve the problem. 
+* Use a solver or optimizer to solve the problem
   
   * If you defined the general goal, you probably need some generic optimizer like
     genetic algorithms
