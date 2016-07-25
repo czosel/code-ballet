@@ -10,7 +10,7 @@ either.
 
 .. _`David McIver`: http://hypothesis.works
 
-So I decided to do a bi-weekly puzzle to flex our maths-muscles. It is like
+So I decided to do a mothly-ish puzzle to flex our maths-muscles. It is like
 code-golf_, but with different goals:
 
 * Write a nice, easy to understand solution
