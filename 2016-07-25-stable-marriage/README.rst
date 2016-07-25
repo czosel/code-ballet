@@ -74,7 +74,7 @@ Elaboration / Proof
   * Other properties?
 
   * Proof by contradiction by finding a contradicting example: using
-    hypthothesis_, genetic algorithms, optimizers, solvers or what you like
+    hypothesis_, genetic algorithms, optimizers, solvers or what you like
 
   * Prove it by using SymPy_ or any other maths tool
 
@@ -85,5 +85,5 @@ we are no mathematicians we need to try this ideas ourself to get a notion
 whether the idea makes sense: Maybe there is nothing beyond what was said in the
 video.
 
-.. _hypthothesis: http://hypthothesis.works
-.. _SymPy_: http://www.sympy.org/
+.. _hypthothesis: http://hypothesis.works
+.. _SymPy: http://www.sympy.org/
