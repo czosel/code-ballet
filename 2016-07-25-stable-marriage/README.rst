@@ -45,10 +45,12 @@ Solver
   * If you defined the general goal, you probably need some generic optimizer like
     genetic algorithms
 
-  * If you defined the result of the algorithm classic solvers or optimizers
+  * If you defined the result of the algorithm classic solvers or optimizers_
     might work
 
 * Or write a solver
+
+.. _optimizers: http://docs.scipy.org/doc/scipy/reference/optimize.html
 
 Algorithm
 ---------
