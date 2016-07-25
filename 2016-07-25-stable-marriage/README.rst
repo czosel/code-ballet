@@ -42,8 +42,8 @@ Solver
 
 * Use a solver or optimizer to solve the problem
   
-  * If you defined the general goal, you probably need some generic optimizer like
-    genetic algorithms
+  * If you defined the general goal, you might need some generic optimizer like
+    genetic algorithms (just a guess)
 
   * If you defined the result of the algorithm classic solvers or optimizers_
     might work
