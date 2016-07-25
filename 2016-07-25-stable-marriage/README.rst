@@ -60,7 +60,7 @@ Algorithm
 Elaboration / Proof
 -------------------
 
-* Elaborate on the marriage problem, find extension, new properties and try to
+* Elaborate on the marriage problem, find extensions, new properties and try to
   prove them
 
   * i.e. there are (no) other solutions than the above algorithm found
