@@ -37,6 +37,8 @@ code-golf_, but with different goals:
 
 .. _code-golf: https://en.wikipedia.org/wiki/Code_golf
 
+PLEASE: Spread the word. :-)
+
 What is pythonic-functional
 ===========================
 
