@@ -1,7 +1,26 @@
 import json
 import pprint
+import collections
 
-info = json.load(open('300.json'))
+class TwoWayDict(dict):
+    def __setitem__(self, key, value):
+        # Remove any previous connections with these values
+        if key in self:
+            del self[key]
+        if value in self:
+            del self[value]
+        dict.__setitem__(self, key, value)
+        dict.__setitem__(self, value, key)
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, self[key])
+        dict.__delitem__(self, key)
+
+    def __len__(self):
+        """Returns the number of connections"""
+        return dict.__len__(self) // 2
+
+info = json.load(open('3.json'))
 
 women       = info['women']
 men         = info['men']
@@ -59,13 +78,52 @@ def choose_preferred(inverted_prefs):
     engagements = {man: None for man in men}
     while countUnmatched(engagements) > 0:
         print('round', round_nr, 'unmatched', countUnmatched(engagements))
+        for man, offers in inverted_prefs[round_nr].items():
+            chosenWoman = choose(offers + [engagements[man]])
+            if (chosenWoman in engagements[man]):
+               removeEngage 
         engagements = {man: choose(offers + [engagements[man]], preferences[man]) for man, offers in inverted_prefs[round_nr].items()}
-        round_nr = round_nr + 1
+        round_nr += 1
+        #pprint.pprint(engagements)
+    return engagements
 
+def solve_procedural():
+    def getUnmatchedWoman(engagements):
+        """
+        return the first woman without a partner or None
+        """
+        for woman in women:
+            if woman not in engagements:
+                return woman
+        return None
+    
+    def is_preferred(prefs, a, b):
+        return prefs.index(a) < prefs.index(b)
+
+    engagements = TwoWayDict()
+    proposals = women_prefs.copy()
+    w = getUnmatchedWoman(engagements)
+    while w:
+        m = proposals[w].pop(0)
+        print(w, 'asks', m)
+        if m not in engagements:
+            engagements[w] = m
+            print(m, 'new', w)
+        else:
+            if is_preferred(men_prefs[m], w, engagements[m]):
+                del engagements[m]
+                engagements[w] = m
+                print(m, 'prefs', w)
+            else:
+                print(m, 'rejects', w)
+        w = getUnmatchedWoman(engagements)
     return engagements
 
 inv = invert_preferences(women_prefs)
-#pprint.pprint(inv)
+pprint.pprint(inv)
 result = choose_preferred(inv)
-print('done.')
-#pprint.pprint(result)
+print('functional result:')
+pprint.pprint(result)
+
+print('procedural result:')
+pprint.pprint(solve_procedural())
