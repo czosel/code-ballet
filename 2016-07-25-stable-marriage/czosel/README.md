@@ -12,14 +12,14 @@ Result:
 
 This solution is outlined here:
 
-1) convert both preference sets to a matrix, where the entries are the preferences expressed as numbers: 0 = favorite, 1 = 2nd best, ... 
-2) add the two matrices (after transposing one of them, such that rows represent women and columns men) - lets call this "mututal preference matrix"
+1. convert both preference sets to a matrix, where the entries are the preferences expressed as numbers: 0 = favorite, 1 = 2nd best, ... 
+2. add the two matrices (after transposing one of them, such that rows represent women and columns men) - lets call this "mututal preference matrix"
 
-3) find the lowest number in the matrix -> this is a match!
-4) cross out the row and the column of the last match, as these two people are now not available for matching anymore.
-5) repeat at (3) with the updated matrix, until only one entry remains (which represents the last match)
+3. find the lowest number in the mutual preference matrix -> this is a match!
+4. cross out the row and the column of the last match, as these two people are now not available for matching anymore.
+5. repeat at (3) with the updated matrix, until only one entry remains (which represents the last match)
 
-The situations, where multiple choices for the lowest number in the matrix exist, correspond to multiple possible solutions.
+The situations where multiple choices for the lowest number in the matrix exist, correspond to multiple possible solutions.
 
 Possible next steps:
 - actually return all results
